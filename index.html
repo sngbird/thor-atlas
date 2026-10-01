@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root { color-scheme: light; } body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important; }</style>
+<title>THOR Regime Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap">
+<style>
+/* Layout: survey atlas. Reference map of models and comparisons on top, regime key strip,
+   filters with a sticky status line, then plates grouped by plot type, then grid notes. */
+:root {
+  --bg: #F2F5F8;
+  --surface: #FFFFFF;
+  --soft: #E6ECF1;
+  --ink: #15212C;
+  --muted: #566676;
+  --line: #D2DBE3;
+  --accent: #4A3C94;
+  --accent-soft: #ECE9F8;
+  --on-accent: #FFFFFF;
+  --plate: #FFFFFF;
+  --scrim: rgba(8, 12, 18, 0.72);
+  --r0: #0072B2; --r1: #E69F00; --r2: #009E73; --r3: #D55E00; --r4: #56B4E9; --r5: #CC79A7;
+  --font-display: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E151B; --surface: #152029; --soft: #1C2832; --ink: #E2EAF0; --muted: #97A7B5;
+    --line: #2A3945; --accent: #B0A5F6; --accent-soft: #252241; --on-accent: #16122E;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E151B; --surface: #152029; --soft: #1C2832; --ink: #E2EAF0; --muted: #97A7B5;
+  --line: #2A3945; --accent: #B0A5F6; --accent-soft: #252241; --on-accent: #16122E;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font-body); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 40px); padding-block: 32px 72px; display: grid; gap: 44px; }
+h1, h2 { font-family: var(--font-display); font-weight: 600; text-wrap: balance; margin: 0; letter-spacing: -0.005em; }
+h1 { font-size: clamp(32px, 5vw, 44px); line-height: 1.08; }
+h2 { font-size: 24px; line-height: 1.2; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+.eyebrow { font: 500 12px var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { max-width: 68ch; color: var(--ink); }
+.meta { font: 400 12.5px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.intro { display: grid; gap: 12px; }
+.block { display: grid; gap: 14px; min-width: 0; }
+.block-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
+.hint { color: var(--muted); font-size: 13.5px; max-width: 70ch; }
+button { font: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Map */
+.map-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+.map-scroll svg { display: block; width: 100%; min-width: 780px; height: auto; }
+.edge { stroke: var(--line); stroke-width: 1.5; fill: none; }
+.edge.hot { stroke: var(--accent); stroke-width: 2.25; }
+.node { cursor: pointer; outline: none; }
+.node rect { fill: var(--surface); stroke: var(--muted); stroke-opacity: 0.45; stroke-width: 1.25; }
+.node.comp rect { fill: var(--bg); stroke-dasharray: 4 3; }
+.node.ref rect { fill: var(--accent-soft); stroke: var(--accent); stroke-opacity: 0.8; }
+.node:hover rect, .node:focus-visible rect { stroke: var(--accent); stroke-opacity: 1; }
+.node:focus-visible rect { stroke-width: 2.5; }
+.node.related rect { stroke: var(--accent); stroke-opacity: 0.7; }
+.node.active rect { stroke: var(--accent); stroke-opacity: 1; stroke-width: 2.75; }
+.node.dim { opacity: 0.42; }
+.t1 { fill: var(--ink); font: 600 13px var(--font-body); }
+.t2 { fill: var(--muted); font: 400 10.5px var(--font-mono); }
+.t3 { fill: var(--muted); font: 400 11px var(--font-body); }
+.map-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; font-size: 13px; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.lg { width: 22px; height: 12px; border-radius: 3px; border: 1.25px solid var(--muted); background: var(--surface); }
+.lg.comp { border-style: dashed; background: var(--bg); }
+.lg.ref { border-color: var(--accent); background: var(--accent-soft); }
+#map-sel strong { color: var(--ink); font-weight: 600; }
+
+/* Regime key */
+.key { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 12px 28px; margin: 0; padding: 0; list-style: none; }
+.key li { display: grid; grid-template-columns: 16px 1fr; gap: 2px 12px; align-items: baseline; min-width: 0; }
+.sw { width: 16px; height: 16px; border-radius: 3px; align-self: center; }
+.key .name { font-weight: 600; }
+.key .name .n { font: 400 12px var(--font-mono); color: var(--muted); margin-right: 6px; }
+.key .name .ab { font-family: var(--font-mono); font-weight: 500; margin-right: 6px; }
+.key .bal { grid-column: 2; font-size: 13px; color: var(--muted); }
+
+/* Filters */
+.filters { display: grid; gap: 10px; }
+.frow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 6px; }
+.flabel { flex: 0 0 104px; font: 500 11.5px var(--font-mono); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 13px; font-weight: 500; line-height: 1.3; cursor: pointer; }
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.chip .c { font: 400 11.5px var(--font-mono); opacity: 0.7; font-variant-numeric: tabular-nums; }
+.chip i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+@media (max-width: 560px) { .flabel { flex-basis: 100%; } }
+
+.status { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); padding-block: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.status .count { font: 500 13px var(--font-mono); font-variant-numeric: tabular-nums; }
+.active { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 6px 3px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--ink); border: 1px solid transparent; font-size: 12.5px; cursor: pointer; }
+.pill:hover { border-color: var(--accent); }
+.pill b { font-weight: 500; color: var(--muted); }
+.pill .x { font-family: var(--font-mono); padding-inline: 4px; color: var(--muted); }
+.btn { padding: 5px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); font-size: 13px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.btn.link { border: none; background: none; color: var(--accent); padding-inline: 4px; text-decoration: underline; text-underline-offset: 3px; }
+
+/* Gallery */
+#gallery { display: grid; gap: 52px; }
+.sec { display: grid; gap: 16px; min-width: 0; scroll-margin-top: 64px; }
+.sec-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.sec-head .count { font: 400 13px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.sec-desc { color: var(--muted); font-size: 14px; max-width: 72ch; }
+.subgroup { display: grid; gap: 12px; }
+.sub-head { margin: 0; padding-top: 10px; border-top: 1px solid var(--line); font: 500 12px var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.sub-head span { color: var(--line); padding-inline: 4px; }
+.plates { display: grid; gap: 22px 18px; }
+.plate { display: grid; gap: 8px; align-content: start; margin: 0; min-width: 0; }
+.frame { display: block; width: 100%; padding: 6px; background: var(--plate); border: 1px solid var(--line); border-radius: 4px; cursor: zoom-in; }
+.frame:hover { border-color: var(--accent); }
+.frame img { display: block; width: 100%; height: auto; }
+.plate figcaption { display: grid; gap: 4px; min-width: 0; }
+.cap-title { font-weight: 600; font-size: 13.5px; line-height: 1.35; }
+.cap-meta { display: flex; flex-wrap: wrap; gap: 5px; }
+.tag { font: 400 11.5px var(--font-mono); color: var(--muted); padding: 1px 6px; border: 1px solid var(--line); border-radius: 3px; }
+.rg { display: inline-flex; align-items: center; gap: 5px; font: 500 11.5px var(--font-mono); padding: 1px 6px 1px 4px; border: 1px solid var(--line); border-radius: 3px; }
+.rg i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.fname { font: 400 11px var(--font-mono); color: var(--muted); overflow-wrap: anywhere; }
+.empty { display: grid; gap: 12px; justify-items: start; padding: 28px; border: 1px dashed var(--line); border-radius: 6px; color: var(--muted); }
+
+/* Notes */
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr)); gap: 32px 48px; align-items: start; }
+.table-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 7px 10px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 500 11px var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.caveats { margin: 0; padding-left: 18px; display: grid; gap: 10px; font-size: 14px; }
+.caveats li { padding-left: 4px; }
+
+/* Lightbox */
+.lb { width: min(96vw, 1440px); max-width: none; max-height: 94vh; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); overflow: hidden; }
+.lb::backdrop { background: var(--scrim); }
+.lb-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.lb-titles { display: grid; gap: 2px; min-width: 0; flex: 1 1 320px; }
+.lb-title { font-weight: 600; }
+.lb-sub { font: 400 11.5px var(--font-mono); color: var(--muted); overflow-wrap: anywhere; }
+.lb-actions { display: flex; align-items: center; gap: 6px; }
+.lb-count { font: 400 12px var(--font-mono); color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
+.lb-body { background: var(--plate); padding: 12px; display: flex; justify-content: center; align-items: center; overflow: auto; max-height: calc(94vh - 72px); }
+.lb-body img { max-width: 100%; max-height: calc(94vh - 100px); width: auto; height: auto; object-fit: contain; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .chip, .btn, .frame, .pill, .node rect { transition: border-color 120ms ease, background-color 120ms ease, stroke 120ms ease; }
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="intro">
+    <p class="eyebrow">CMIP6 · THOR ensemble results</p>
+    <h1>THOR Regime Atlas</h1>
+    <p class="lede">THOR's 50-member neural-network ensemble assigns each ocean grid point to one of six dynamical regimes from Sonnewald &amp; Lguensat (2021). These plots cover seven CMIP6 models across the historical, 1pctCO2, and abrupt-4xCO2 experiments, SHAP feature attributions for five of them, and a comparison against THOR run on the ECCO state estimate.</p>
+    <p class="meta" id="meta"></p>
+  </header>
+
+  <section class="block" aria-labelledby="map-h">
+    <div class="block-head">
+      <h2 id="map-h">Models and comparisons</h2>
+      <p class="hint">Select a model to see all of its plots, or a comparison node to see the plots that put those models side by side.</p>
+    </div>
+    <div class="map-scroll"><svg id="map" viewBox="0 0 1000 440" role="group" aria-label="Map of models and comparison sets"></svg></div>
+    <div class="map-foot">
+      <p id="map-sel" aria-live="polite"></p>
+      <div class="legend" aria-hidden="true">
+        <span><i class="lg"></i>Model</span>
+        <span><i class="lg comp"></i>Comparison set</span>
+        <span><i class="lg ref"></i>Reference</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="key-h">
+    <div class="block-head">
+      <h2 id="key-h">Regime key</h2>
+      <p class="hint">Class number, name, and the dominant balance of barotropic vorticity terms that defines each regime.</p>
+    </div>
+    <ul class="key" id="key"></ul>
+  </section>
+
+  <section class="block" aria-labelledby="filter-h" id="plots">
+    <div class="block-head">
+      <h2 id="filter-h">Plots</h2>
+    </div>
+    <div class="filters" id="filters"></div>
+    <div class="status">
+      <span class="count" id="count"></span>
+      <div class="active" id="active"></div>
+      <button type="button" class="btn link" id="clear-all" hidden>Clear all</button>
+    </div>
+    <div id="gallery"></div>
+  </section>
+
+  <section class="notes" aria-label="Notes">
+    <div class="block">
+      <h2>Model grids</h2>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Model</th><th>Ocean grid</th><th>Rows × cols</th><th>Spacing at 35°N</th><th>KE points</th></tr></thead>
+          <tbody id="grid-rows"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="block">
+      <h2>Caveats</h2>
+      <ul class="caveats">
+        <li>ECCO's mask blanks some ocean: the Sea of Japan, most of the Sea of Okhotsk, and the East China Sea shelf. Small islands such as the Azores, Madeira, and the Faroes show up as coarse blocks. The mask comes from ECCO's own preprocessing (a budget-residual filter combined with the open-water fraction), which isn't included in the DNN4Cli code.</li>
+        <li>Model coastlines look wider than ECCO's. THOR's inputs use spatial gradients, which are undefined next to land, so each model loses about 9% more cells than its bathymetry mask alone removes.</li>
+        <li>Class numbers were matched to regime names from the Step 1 clustering data, using term magnitudes, term signs, and geography against Sonnewald &amp; Lguensat (2021). The original code doesn't store this mapping.</li>
+        <li>SHAP uses fastshap's KernelExplainer with a 100-point background sample, run separately on each of the 50 ensemble members.</li>
+        <li>E3SM-1-0 publishes its ocean output already regridded to 1°. The other models are plotted on their native curvilinear grids.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<dialog class="lb" id="lb" aria-labelledby="lb-title">
+  <div class="lb-bar">
+    <div class="lb-titles">
+      <p class="lb-title" id="lb-title"></p>
+      <p class="lb-sub" id="lb-sub"></p>
+    </div>
+    <div class="lb-actions">
+      <span class="lb-count" id="lb-count"></span>
+      <button type="button" class="btn" id="lb-prev" aria-label="Previous plot">&larr;</button>
+      <button type="button" class="btn" id="lb-next" aria-label="Next plot">&rarr;</button>
+      <button type="button" class="btn" id="lb-close">Close</button>
+    </div>
+  </div>
+  <div class="lb-body"><img id="lb-img" alt=""></div>
+</dialog>
+
+<script>
+const ITEMS = [{"src":"img/thor_regimes_ke_GFDL-CM4_historical.png","file":"thor_regimes_ke_GFDL-CM4_historical.png","w":700,"h":577,"type":"regimes","models":["GFDL-CM4"],"scenario":"historical","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_GFDL-CM4_1pctCO2.png","file":"thor_regimes_ke_GFDL-CM4_1pctCO2.png","w":700,"h":577,"type":"regimes","models":["GFDL-CM4"],"scenario":"1pctCO2","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_GFDL-CM4_abrupt-4xCO2.png","file":"thor_regimes_ke_GFDL-CM4_abrupt-4xCO2.png","w":700,"h":577,"type":"regimes","models":["GFDL-CM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_GFDL-ESM4_historical.png","file":"thor_regimes_ke_GFDL-ESM4_historical.png","w":700,"h":577,"type":"regimes","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_GFDL-ESM4_1pctCO2.png","file":"thor_regimes_ke_GFDL-ESM4_1pctCO2.png","w":700,"h":577,"type":"regimes","models":["GFDL-ESM4"],"scenario":"1pctCO2","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_GFDL-ESM4_abrupt-4xCO2.png","file":"thor_regimes_ke_GFDL-ESM4_abrupt-4xCO2.png","w":700,"h":577,"type":"regimes","models":["GFDL-ESM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_IPSL-CM6A-LR_historical.png","file":"thor_regimes_ke_IPSL-CM6A-LR_historical.png","w":700,"h":577,"type":"regimes","models":["IPSL-CM6A-LR"],"scenario":"historical","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_IPSL-CM6A-LR_1pctCO2.png","file":"thor_regimes_ke_IPSL-CM6A-LR_1pctCO2.png","w":700,"h":577,"type":"regimes","models":["IPSL-CM6A-LR"],"scenario":"1pctCO2","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_IPSL-CM6A-LR_abrupt-4xCO2.png","file":"thor_regimes_ke_IPSL-CM6A-LR_abrupt-4xCO2.png","w":700,"h":577,"type":"regimes","models":["IPSL-CM6A-LR"],"scenario":"abrupt-4xCO2","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_UKESM1-0-LL_historical.png","file":"thor_regimes_ke_UKESM1-0-LL_historical.png","w":700,"h":577,"type":"regimes","models":["UKESM1-0-LL"],"scenario":"historical","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_UKESM1-0-LL_1pctCO2.png","file":"thor_regimes_ke_UKESM1-0-LL_1pctCO2.png","w":700,"h":577,"type":"regimes","models":["UKESM1-0-LL"],"scenario":"1pctCO2","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_UKESM1-0-LL_abrupt-4xCO2.png","file":"thor_regimes_ke_UKESM1-0-LL_abrupt-4xCO2.png","w":700,"h":577,"type":"regimes","models":["UKESM1-0-LL"],"scenario":"abrupt-4xCO2","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_CESM2_historical.png","file":"thor_regimes_ke_CESM2_historical.png","w":700,"h":577,"type":"regimes","models":["CESM2"],"scenario":"historical","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_CESM2_1pctCO2.png","file":"thor_regimes_ke_CESM2_1pctCO2.png","w":700,"h":577,"type":"regimes","models":["CESM2"],"scenario":"1pctCO2","basin":"ke","regime":null,"group":null},{"src":"img/thor_regimes_ke_CESM2_abrupt-4xCO2.png","file":"thor_regimes_ke_CESM2_abrupt-4xCO2.png","w":700,"h":577,"type":"regimes","models":["CESM2"],"scenario":"abrupt-4xCO2","basin":"ke","regime":null,"group":null},{"src":"img/GFDL-CM4_historical_shap_ke_regime0.png","file":"GFDL-CM4_historical_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"historical","basin":"ke","regime":0,"group":null},{"src":"img/GFDL-CM4_historical_shap_ke_regime1.png","file":"GFDL-CM4_historical_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"historical","basin":"ke","regime":1,"group":null},{"src":"img/GFDL-CM4_historical_shap_ke_regime2.png","file":"GFDL-CM4_historical_shap_ke_regime2.png","w":1660,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"historical","basin":"ke","regime":2,"group":null},{"src":"img/GFDL-CM4_historical_shap_ke_regime3.png","file":"GFDL-CM4_historical_shap_ke_regime3.png","w":1659,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"historical","basin":"ke","regime":3,"group":null},{"src":"img/GFDL-CM4_historical_shap_ke_regime4.png","file":"GFDL-CM4_historical_shap_ke_regime4.png","w":1660,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"historical","basin":"ke","regime":4,"group":null},{"src":"img/GFDL-CM4_historical_shap_ke_regime5.png","file":"GFDL-CM4_historical_shap_ke_regime5.png","w":1660,"h":723,"type":"shap","models":["GFDL-CM4"],"scenario":"historical","basin":"ke","regime":5,"group":null},{"src":"img/GFDL-CM4_1pctCO2_shap_ke_regime0.png","file":"GFDL-CM4_1pctCO2_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"1pctCO2","basin":"ke","regime":0,"group":null},{"src":"img/GFDL-CM4_1pctCO2_shap_ke_regime1.png","file":"GFDL-CM4_1pctCO2_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"1pctCO2","basin":"ke","regime":1,"group":null},{"src":"img/GFDL-CM4_1pctCO2_shap_ke_regime2.png","file":"GFDL-CM4_1pctCO2_shap_ke_regime2.png","w":1660,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"1pctCO2","basin":"ke","regime":2,"group":null},{"src":"img/GFDL-CM4_1pctCO2_shap_ke_regime3.png","file":"GFDL-CM4_1pctCO2_shap_ke_regime3.png","w":1659,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"1pctCO2","basin":"ke","regime":3,"group":null},{"src":"img/GFDL-CM4_1pctCO2_shap_ke_regime4.png","file":"GFDL-CM4_1pctCO2_shap_ke_regime4.png","w":1660,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"1pctCO2","basin":"ke","regime":4,"group":null},{"src":"img/GFDL-CM4_1pctCO2_shap_ke_regime5.png","file":"GFDL-CM4_1pctCO2_shap_ke_regime5.png","w":1660,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"1pctCO2","basin":"ke","regime":5,"group":null},{"src":"img/GFDL-CM4_abrupt-4xCO2_shap_ke_regime0.png","file":"GFDL-CM4_abrupt-4xCO2_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":0,"group":null},{"src":"img/GFDL-CM4_abrupt-4xCO2_shap_ke_regime1.png","file":"GFDL-CM4_abrupt-4xCO2_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":1,"group":null},{"src":"img/GFDL-CM4_abrupt-4xCO2_shap_ke_regime2.png","file":"GFDL-CM4_abrupt-4xCO2_shap_ke_regime2.png","w":1660,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":2,"group":null},{"src":"img/GFDL-CM4_abrupt-4xCO2_shap_ke_regime3.png","file":"GFDL-CM4_abrupt-4xCO2_shap_ke_regime3.png","w":1659,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":3,"group":null},{"src":"img/GFDL-CM4_abrupt-4xCO2_shap_ke_regime4.png","file":"GFDL-CM4_abrupt-4xCO2_shap_ke_regime4.png","w":1660,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":4,"group":null},{"src":"img/GFDL-CM4_abrupt-4xCO2_shap_ke_regime5.png","file":"GFDL-CM4_abrupt-4xCO2_shap_ke_regime5.png","w":1660,"h":722,"type":"shap","models":["GFDL-CM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":5,"group":null},{"src":"img/GFDL-ESM4_historical_shap_ke_regime0.png","file":"GFDL-ESM4_historical_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":0,"group":null},{"src":"img/GFDL-ESM4_historical_shap_ke_regime1.png","file":"GFDL-ESM4_historical_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":1,"group":null},{"src":"img/GFDL-ESM4_historical_shap_ke_regime2.png","file":"GFDL-ESM4_historical_shap_ke_regime2.png","w":1659,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":2,"group":null},{"src":"img/GFDL-ESM4_historical_shap_ke_regime3.png","file":"GFDL-ESM4_historical_shap_ke_regime3.png","w":1659,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":3,"group":null},{"src":"img/GFDL-ESM4_historical_shap_ke_regime4.png","file":"GFDL-ESM4_historical_shap_ke_regime4.png","w":1660,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":4,"group":null},{"src":"img/GFDL-ESM4_historical_shap_ke_regime5.png","file":"GFDL-ESM4_historical_shap_ke_regime5.png","w":1660,"h":723,"type":"shap","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":5,"group":null},{"src":"img/GFDL-ESM4_1pctCO2_shap_ke_regime0.png","file":"GFDL-ESM4_1pctCO2_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"1pctCO2","basin":"ke","regime":0,"group":null},{"src":"img/GFDL-ESM4_1pctCO2_shap_ke_regime1.png","file":"GFDL-ESM4_1pctCO2_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"1pctCO2","basin":"ke","regime":1,"group":null},{"src":"img/GFDL-ESM4_1pctCO2_shap_ke_regime2.png","file":"GFDL-ESM4_1pctCO2_shap_ke_regime2.png","w":1659,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"1pctCO2","basin":"ke","regime":2,"group":null},{"src":"img/GFDL-ESM4_1pctCO2_shap_ke_regime3.png","file":"GFDL-ESM4_1pctCO2_shap_ke_regime3.png","w":1659,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"1pctCO2","basin":"ke","regime":3,"group":null},{"src":"img/GFDL-ESM4_1pctCO2_shap_ke_regime4.png","file":"GFDL-ESM4_1pctCO2_shap_ke_regime4.png","w":1660,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"1pctCO2","basin":"ke","regime":4,"group":null},{"src":"img/GFDL-ESM4_1pctCO2_shap_ke_regime5.png","file":"GFDL-ESM4_1pctCO2_shap_ke_regime5.png","w":1660,"h":723,"type":"shap","models":["GFDL-ESM4"],"scenario":"1pctCO2","basin":"ke","regime":5,"group":null},{"src":"img/GFDL-ESM4_abrupt-4xCO2_shap_ke_regime0.png","file":"GFDL-ESM4_abrupt-4xCO2_shap_ke_regime0.png","w":1660,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":0,"group":null},{"src":"img/GFDL-ESM4_abrupt-4xCO2_shap_ke_regime1.png","file":"GFDL-ESM4_abrupt-4xCO2_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":1,"group":null},{"src":"img/GFDL-ESM4_abrupt-4xCO2_shap_ke_regime2.png","file":"GFDL-ESM4_abrupt-4xCO2_shap_ke_regime2.png","w":1659,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":2,"group":null},{"src":"img/GFDL-ESM4_abrupt-4xCO2_shap_ke_regime3.png","file":"GFDL-ESM4_abrupt-4xCO2_shap_ke_regime3.png","w":1659,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":3,"group":null},{"src":"img/GFDL-ESM4_abrupt-4xCO2_shap_ke_regime4.png","file":"GFDL-ESM4_abrupt-4xCO2_shap_ke_regime4.png","w":1660,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":4,"group":null},{"src":"img/GFDL-ESM4_abrupt-4xCO2_shap_ke_regime5.png","file":"GFDL-ESM4_abrupt-4xCO2_shap_ke_regime5.png","w":1660,"h":722,"type":"shap","models":["GFDL-ESM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":5,"group":null},{"src":"img/IPSL-CM6A-LR_historical_shap_ke_regime0.png","file":"IPSL-CM6A-LR_historical_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"historical","basin":"ke","regime":0,"group":null},{"src":"img/IPSL-CM6A-LR_historical_shap_ke_regime1.png","file":"IPSL-CM6A-LR_historical_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"historical","basin":"ke","regime":1,"group":null},{"src":"img/IPSL-CM6A-LR_historical_shap_ke_regime2.png","file":"IPSL-CM6A-LR_historical_shap_ke_regime2.png","w":1660,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"historical","basin":"ke","regime":2,"group":null},{"src":"img/IPSL-CM6A-LR_historical_shap_ke_regime3.png","file":"IPSL-CM6A-LR_historical_shap_ke_regime3.png","w":1660,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"historical","basin":"ke","regime":3,"group":null},{"src":"img/IPSL-CM6A-LR_historical_shap_ke_regime5.png","file":"IPSL-CM6A-LR_historical_shap_ke_regime5.png","w":1660,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"historical","basin":"ke","regime":5,"group":null},{"src":"img/IPSL-CM6A-LR_1pctCO2_shap_ke_regime0.png","file":"IPSL-CM6A-LR_1pctCO2_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"1pctCO2","basin":"ke","regime":0,"group":null},{"src":"img/IPSL-CM6A-LR_1pctCO2_shap_ke_regime1.png","file":"IPSL-CM6A-LR_1pctCO2_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"1pctCO2","basin":"ke","regime":1,"group":null},{"src":"img/IPSL-CM6A-LR_1pctCO2_shap_ke_regime2.png","file":"IPSL-CM6A-LR_1pctCO2_shap_ke_regime2.png","w":1660,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"1pctCO2","basin":"ke","regime":2,"group":null},{"src":"img/IPSL-CM6A-LR_1pctCO2_shap_ke_regime3.png","file":"IPSL-CM6A-LR_1pctCO2_shap_ke_regime3.png","w":1660,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"1pctCO2","basin":"ke","regime":3,"group":null},{"src":"img/IPSL-CM6A-LR_1pctCO2_shap_ke_regime5.png","file":"IPSL-CM6A-LR_1pctCO2_shap_ke_regime5.png","w":1660,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"1pctCO2","basin":"ke","regime":5,"group":null},{"src":"img/IPSL-CM6A-LR_abrupt-4xCO2_shap_ke_regime0.png","file":"IPSL-CM6A-LR_abrupt-4xCO2_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"abrupt-4xCO2","basin":"ke","regime":0,"group":null},{"src":"img/IPSL-CM6A-LR_abrupt-4xCO2_shap_ke_regime1.png","file":"IPSL-CM6A-LR_abrupt-4xCO2_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"abrupt-4xCO2","basin":"ke","regime":1,"group":null},{"src":"img/IPSL-CM6A-LR_abrupt-4xCO2_shap_ke_regime2.png","file":"IPSL-CM6A-LR_abrupt-4xCO2_shap_ke_regime2.png","w":1660,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"abrupt-4xCO2","basin":"ke","regime":2,"group":null},{"src":"img/IPSL-CM6A-LR_abrupt-4xCO2_shap_ke_regime3.png","file":"IPSL-CM6A-LR_abrupt-4xCO2_shap_ke_regime3.png","w":1660,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"abrupt-4xCO2","basin":"ke","regime":3,"group":null},{"src":"img/IPSL-CM6A-LR_abrupt-4xCO2_shap_ke_regime5.png","file":"IPSL-CM6A-LR_abrupt-4xCO2_shap_ke_regime5.png","w":1660,"h":722,"type":"shap","models":["IPSL-CM6A-LR"],"scenario":"abrupt-4xCO2","basin":"ke","regime":5,"group":null},{"src":"img/UKESM1-0-LL_historical_shap_ke_regime0.png","file":"UKESM1-0-LL_historical_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"historical","basin":"ke","regime":0,"group":null},{"src":"img/UKESM1-0-LL_historical_shap_ke_regime1.png","file":"UKESM1-0-LL_historical_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"historical","basin":"ke","regime":1,"group":null},{"src":"img/UKESM1-0-LL_historical_shap_ke_regime2.png","file":"UKESM1-0-LL_historical_shap_ke_regime2.png","w":1660,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"historical","basin":"ke","regime":2,"group":null},{"src":"img/UKESM1-0-LL_historical_shap_ke_regime3.png","file":"UKESM1-0-LL_historical_shap_ke_regime3.png","w":1660,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"historical","basin":"ke","regime":3,"group":null},{"src":"img/UKESM1-0-LL_historical_shap_ke_regime4.png","file":"UKESM1-0-LL_historical_shap_ke_regime4.png","w":1660,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"historical","basin":"ke","regime":4,"group":null},{"src":"img/UKESM1-0-LL_historical_shap_ke_regime5.png","file":"UKESM1-0-LL_historical_shap_ke_regime5.png","w":1660,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"historical","basin":"ke","regime":5,"group":null},{"src":"img/UKESM1-0-LL_1pctCO2_shap_ke_regime0.png","file":"UKESM1-0-LL_1pctCO2_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"1pctCO2","basin":"ke","regime":0,"group":null},{"src":"img/UKESM1-0-LL_1pctCO2_shap_ke_regime1.png","file":"UKESM1-0-LL_1pctCO2_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"1pctCO2","basin":"ke","regime":1,"group":null},{"src":"img/UKESM1-0-LL_1pctCO2_shap_ke_regime2.png","file":"UKESM1-0-LL_1pctCO2_shap_ke_regime2.png","w":1660,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"1pctCO2","basin":"ke","regime":2,"group":null},{"src":"img/UKESM1-0-LL_1pctCO2_shap_ke_regime3.png","file":"UKESM1-0-LL_1pctCO2_shap_ke_regime3.png","w":1660,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"1pctCO2","basin":"ke","regime":3,"group":null},{"src":"img/UKESM1-0-LL_1pctCO2_shap_ke_regime5.png","file":"UKESM1-0-LL_1pctCO2_shap_ke_regime5.png","w":1660,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"1pctCO2","basin":"ke","regime":5,"group":null},{"src":"img/UKESM1-0-LL_abrupt-4xCO2_shap_ke_regime0.png","file":"UKESM1-0-LL_abrupt-4xCO2_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"abrupt-4xCO2","basin":"ke","regime":0,"group":null},{"src":"img/UKESM1-0-LL_abrupt-4xCO2_shap_ke_regime1.png","file":"UKESM1-0-LL_abrupt-4xCO2_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"abrupt-4xCO2","basin":"ke","regime":1,"group":null},{"src":"img/UKESM1-0-LL_abrupt-4xCO2_shap_ke_regime2.png","file":"UKESM1-0-LL_abrupt-4xCO2_shap_ke_regime2.png","w":1660,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"abrupt-4xCO2","basin":"ke","regime":2,"group":null},{"src":"img/UKESM1-0-LL_abrupt-4xCO2_shap_ke_regime3.png","file":"UKESM1-0-LL_abrupt-4xCO2_shap_ke_regime3.png","w":1660,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"abrupt-4xCO2","basin":"ke","regime":3,"group":null},{"src":"img/UKESM1-0-LL_abrupt-4xCO2_shap_ke_regime5.png","file":"UKESM1-0-LL_abrupt-4xCO2_shap_ke_regime5.png","w":1660,"h":722,"type":"shap","models":["UKESM1-0-LL"],"scenario":"abrupt-4xCO2","basin":"ke","regime":5,"group":null},{"src":"img/CESM2_historical_shap_ke_regime0.png","file":"CESM2_historical_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["CESM2"],"scenario":"historical","basin":"ke","regime":0,"group":null},{"src":"img/CESM2_historical_shap_ke_regime1.png","file":"CESM2_historical_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["CESM2"],"scenario":"historical","basin":"ke","regime":1,"group":null},{"src":"img/CESM2_historical_shap_ke_regime2.png","file":"CESM2_historical_shap_ke_regime2.png","w":1660,"h":722,"type":"shap","models":["CESM2"],"scenario":"historical","basin":"ke","regime":2,"group":null},{"src":"img/CESM2_historical_shap_ke_regime3.png","file":"CESM2_historical_shap_ke_regime3.png","w":1660,"h":722,"type":"shap","models":["CESM2"],"scenario":"historical","basin":"ke","regime":3,"group":null},{"src":"img/CESM2_historical_shap_ke_regime5.png","file":"CESM2_historical_shap_ke_regime5.png","w":1660,"h":722,"type":"shap","models":["CESM2"],"scenario":"historical","basin":"ke","regime":5,"group":null},{"src":"img/CESM2_1pctCO2_shap_ke_regime0.png","file":"CESM2_1pctCO2_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["CESM2"],"scenario":"1pctCO2","basin":"ke","regime":0,"group":null},{"src":"img/CESM2_1pctCO2_shap_ke_regime1.png","file":"CESM2_1pctCO2_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["CESM2"],"scenario":"1pctCO2","basin":"ke","regime":1,"group":null},{"src":"img/CESM2_1pctCO2_shap_ke_regime2.png","file":"CESM2_1pctCO2_shap_ke_regime2.png","w":1660,"h":722,"type":"shap","models":["CESM2"],"scenario":"1pctCO2","basin":"ke","regime":2,"group":null},{"src":"img/CESM2_1pctCO2_shap_ke_regime3.png","file":"CESM2_1pctCO2_shap_ke_regime3.png","w":1660,"h":722,"type":"shap","models":["CESM2"],"scenario":"1pctCO2","basin":"ke","regime":3,"group":null},{"src":"img/CESM2_1pctCO2_shap_ke_regime5.png","file":"CESM2_1pctCO2_shap_ke_regime5.png","w":1660,"h":722,"type":"shap","models":["CESM2"],"scenario":"1pctCO2","basin":"ke","regime":5,"group":null},{"src":"img/CESM2_abrupt-4xCO2_shap_ke_regime0.png","file":"CESM2_abrupt-4xCO2_shap_ke_regime0.png","w":1659,"h":722,"type":"shap","models":["CESM2"],"scenario":"abrupt-4xCO2","basin":"ke","regime":0,"group":null},{"src":"img/CESM2_abrupt-4xCO2_shap_ke_regime1.png","file":"CESM2_abrupt-4xCO2_shap_ke_regime1.png","w":1659,"h":722,"type":"shap","models":["CESM2"],"scenario":"abrupt-4xCO2","basin":"ke","regime":1,"group":null},{"src":"img/CESM2_abrupt-4xCO2_shap_ke_regime2.png","file":"CESM2_abrupt-4xCO2_shap_ke_regime2.png","w":1660,"h":722,"type":"shap","models":["CESM2"],"scenario":"abrupt-4xCO2","basin":"ke","regime":2,"group":null},{"src":"img/CESM2_abrupt-4xCO2_shap_ke_regime3.png","file":"CESM2_abrupt-4xCO2_shap_ke_regime3.png","w":1660,"h":722,"type":"shap","models":["CESM2"],"scenario":"abrupt-4xCO2","basin":"ke","regime":3,"group":null},{"src":"img/CESM2_abrupt-4xCO2_shap_ke_regime5.png","file":"CESM2_abrupt-4xCO2_shap_ke_regime5.png","w":1660,"h":722,"type":"shap","models":["CESM2"],"scenario":"abrupt-4xCO2","basin":"ke","regime":5,"group":null},{"src":"img/GFDL-CM4_historical_shap_custom_regime0.png","file":"GFDL-CM4_historical_shap_custom_regime0.png","w":1659,"h":715,"type":"shap_window","models":["GFDL-CM4"],"scenario":"historical","basin":"ke","regime":0,"group":null},{"src":"img/GFDL-CM4_historical_shap_custom_regime1.png","file":"GFDL-CM4_historical_shap_custom_regime1.png","w":1659,"h":715,"type":"shap_window","models":["GFDL-CM4"],"scenario":"historical","basin":"ke","regime":1,"group":null},{"src":"img/GFDL-CM4_historical_shap_custom_regime2.png","file":"GFDL-CM4_historical_shap_custom_regime2.png","w":1659,"h":715,"type":"shap_window","models":["GFDL-CM4"],"scenario":"historical","basin":"ke","regime":2,"group":null},{"src":"img/GFDL-CM4_historical_shap_custom_regime3.png","file":"GFDL-CM4_historical_shap_custom_regime3.png","w":1659,"h":715,"type":"shap_window","models":["GFDL-CM4"],"scenario":"historical","basin":"ke","regime":3,"group":null},{"src":"img/GFDL-CM4_historical_shap_custom_regime4.png","file":"GFDL-CM4_historical_shap_custom_regime4.png","w":1659,"h":715,"type":"shap_window","models":["GFDL-CM4"],"scenario":"historical","basin":"ke","regime":4,"group":null},{"src":"img/GFDL-CM4_historical_shap_custom_regime5.png","file":"GFDL-CM4_historical_shap_custom_regime5.png","w":1659,"h":715,"type":"shap_window","models":["GFDL-CM4"],"scenario":"historical","basin":"ke","regime":5,"group":null},{"src":"img/GFDL-ESM4_historical_shap_custom_regime0.png","file":"GFDL-ESM4_historical_shap_custom_regime0.png","w":1659,"h":715,"type":"shap_window","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":0,"group":null},{"src":"img/GFDL-ESM4_historical_shap_custom_regime1.png","file":"GFDL-ESM4_historical_shap_custom_regime1.png","w":1659,"h":715,"type":"shap_window","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":1,"group":null},{"src":"img/GFDL-ESM4_historical_shap_custom_regime2.png","file":"GFDL-ESM4_historical_shap_custom_regime2.png","w":1659,"h":715,"type":"shap_window","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":2,"group":null},{"src":"img/GFDL-ESM4_historical_shap_custom_regime3.png","file":"GFDL-ESM4_historical_shap_custom_regime3.png","w":1659,"h":715,"type":"shap_window","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":3,"group":null},{"src":"img/GFDL-ESM4_historical_shap_custom_regime4.png","file":"GFDL-ESM4_historical_shap_custom_regime4.png","w":1659,"h":715,"type":"shap_window","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":4,"group":null},{"src":"img/GFDL-ESM4_historical_shap_custom_regime5.png","file":"GFDL-ESM4_historical_shap_custom_regime5.png","w":1659,"h":720,"type":"shap_window","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":5,"group":null},{"src":"img/thor_vs_ecco_GFDL-ESM4_historical_ke.png","file":"thor_vs_ecco_GFDL-ESM4_historical_ke.png","w":1400,"h":752,"type":"ecco","models":["GFDL-ESM4"],"scenario":"historical","basin":"ke","regime":null,"group":"ecco-GFDL-ESM4"},{"src":"img/thor_vs_ecco_GFDL-ESM4_historical_na.png","file":"thor_vs_ecco_GFDL-ESM4_historical_na.png","w":1400,"h":542,"type":"ecco","models":["GFDL-ESM4"],"scenario":"historical","basin":"na","regime":null,"group":"ecco-GFDL-ESM4"},{"src":"img/thor_vs_ecco_GFDL-ESM4_1pctCO2_ke.png","file":"thor_vs_ecco_GFDL-ESM4_1pctCO2_ke.png","w":1400,"h":752,"type":"ecco","models":["GFDL-ESM4"],"scenario":"1pctCO2","basin":"ke","regime":null,"group":"ecco-GFDL-ESM4"},{"src":"img/thor_vs_ecco_GFDL-ESM4_1pctCO2_na.png","file":"thor_vs_ecco_GFDL-ESM4_1pctCO2_na.png","w":1400,"h":542,"type":"ecco","models":["GFDL-ESM4"],"scenario":"1pctCO2","basin":"na","regime":null,"group":"ecco-GFDL-ESM4"},{"src":"img/thor_vs_ecco_GFDL-ESM4_abrupt-4xCO2_ke.png","file":"thor_vs_ecco_GFDL-ESM4_abrupt-4xCO2_ke.png","w":1400,"h":752,"type":"ecco","models":["GFDL-ESM4"],"scenario":"abrupt-4xCO2","basin":"ke","regime":null,"group":"ecco-GFDL-ESM4"},{"src":"img/thor_vs_ecco_GFDL-ESM4_abrupt-4xCO2_na.png","file":"thor_vs_ecco_GFDL-ESM4_abrupt-4xCO2_na.png","w":1400,"h":542,"type":"ecco","models":["GFDL-ESM4"],"scenario":"abrupt-4xCO2","basin":"na","regime":null,"group":"ecco-GFDL-ESM4"},{"src":"img/thor_vs_ecco_CESM2_historical_ke.png","file":"thor_vs_ecco_CESM2_historical_ke.png","w":1400,"h":752,"type":"ecco","models":["CESM2"],"scenario":"historical","basin":"ke","regime":null,"group":"ecco-CESM2"},{"src":"img/thor_vs_ecco_CESM2_historical_na.png","file":"thor_vs_ecco_CESM2_historical_na.png","w":1400,"h":542,"type":"ecco","models":["CESM2"],"scenario":"historical","basin":"na","regime":null,"group":"ecco-CESM2"},{"src":"img/thor_vs_ecco_CESM2_1pctCO2_ke.png","file":"thor_vs_ecco_CESM2_1pctCO2_ke.png","w":1400,"h":752,"type":"ecco","models":["CESM2"],"scenario":"1pctCO2","basin":"ke","regime":null,"group":"ecco-CESM2"},{"src":"img/thor_vs_ecco_CESM2_1pctCO2_na.png","file":"thor_vs_ecco_CESM2_1pctCO2_na.png","w":1400,"h":542,"type":"ecco","models":["CESM2"],"scenario":"1pctCO2","basin":"na","regime":null,"group":"ecco-CESM2"},{"src":"img/thor_vs_ecco_CESM2_abrupt-4xCO2_ke.png","file":"thor_vs_ecco_CESM2_abrupt-4xCO2_ke.png","w":1400,"h":752,"type":"ecco","models":["CESM2"],"scenario":"abrupt-4xCO2","basin":"ke","regime":null,"group":"ecco-CESM2"},{"src":"img/thor_vs_ecco_CESM2_abrupt-4xCO2_na.png","file":"thor_vs_ecco_CESM2_abrupt-4xCO2_na.png","w":1400,"h":542,"type":"ecco","models":["CESM2"],"scenario":"abrupt-4xCO2","basin":"na","regime":null,"group":"ecco-CESM2"},{"src":"img/intermodel_gfdl_ke_thor_regions.png","file":"intermodel_gfdl_ke_thor_regions.png","w":1800,"h":1272,"type":"grid_regimes","models":["GFDL-CM4","GFDL-ESM4"],"scenario":"all","basin":"ke","regime":null,"group":"gfdl"},{"src":"img/intermodel_gfdl_na_thor_regions.png","file":"intermodel_gfdl_na_thor_regions.png","w":1800,"h":912,"type":"grid_regimes","models":["GFDL-CM4","GFDL-ESM4"],"scenario":"all","basin":"na","regime":null,"group":"gfdl"},{"src":"img/intermodel_lowres_ke_thor_regions.png","file":"intermodel_lowres_ke_thor_regions.png","w":1800,"h":1907,"type":"grid_regimes","models":["IPSL-CM6A-LR","CESM2","UKESM1-0-LL"],"scenario":"all","basin":"ke","regime":null,"group":"lowres"},{"src":"img/intermodel_lowres_na_thor_regions.png","file":"intermodel_lowres_na_thor_regions.png","w":1800,"h":1368,"type":"grid_regimes","models":["IPSL-CM6A-LR","CESM2","UKESM1-0-LL"],"scenario":"all","basin":"na","regime":null,"group":"lowres"},{"src":"img/intermodel_ke_thor_regions.png","file":"intermodel_ke_thor_regions.png","w":1800,"h":1907,"type":"grid_regimes","models":["CESM2","E3SM-1-0","CanESM5"],"scenario":"all","basin":"ke","regime":null,"group":"orig"},{"src":"img/intermodel_na_thor_regions.png","file":"intermodel_na_thor_regions.png","w":1800,"h":1368,"type":"grid_regimes","models":["CESM2","E3SM-1-0","CanESM5"],"scenario":"all","basin":"na","regime":null,"group":"orig"},{"src":"img/intermodel_gfdl_ke_pre_thor.png","file":"intermodel_gfdl_ke_pre_thor.png","w":1800,"h":1272,"type":"grid_ssh","models":["GFDL-CM4","GFDL-ESM4"],"scenario":"all","basin":"ke","regime":null,"group":"gfdl"},{"src":"img/intermodel_gfdl_na_pre_thor.png","file":"intermodel_gfdl_na_pre_thor.png","w":1800,"h":912,"type":"grid_ssh","models":["GFDL-CM4","GFDL-ESM4"],"scenario":"all","basin":"na","regime":null,"group":"gfdl"},{"src":"img/intermodel_lowres_ke_pre_thor.png","file":"intermodel_lowres_ke_pre_thor.png","w":1800,"h":1907,"type":"grid_ssh","models":["IPSL-CM6A-LR","CESM2","UKESM1-0-LL"],"scenario":"all","basin":"ke","regime":null,"group":"lowres"},{"src":"img/intermodel_lowres_na_pre_thor.png","file":"intermodel_lowres_na_pre_thor.png","w":1800,"h":1368,"type":"grid_ssh","models":["IPSL-CM6A-LR","CESM2","UKESM1-0-LL"],"scenario":"all","basin":"na","regime":null,"group":"lowres"},{"src":"img/intermodel_ke_pre_thor.png","file":"intermodel_ke_pre_thor.png","w":1800,"h":1907,"type":"grid_ssh","models":["CESM2","E3SM-1-0","CanESM5"],"scenario":"all","basin":"ke","regime":null,"group":"orig"},{"src":"img/intermodel_na_pre_thor.png","file":"intermodel_na_pre_thor.png","w":1800,"h":1368,"type":"grid_ssh","models":["CESM2","E3SM-1-0","CanESM5"],"scenario":"all","basin":"na","regime":null,"group":"orig"},{"src":"img/regime_key.png","file":"regime_key.png","w":1500,"h":720,"type":"key","models":[],"scenario":null,"basin":null,"regime":null,"group":null}];
+
+const REGIMES = [
+  { ab: "MD",   name: "Momentum Driven",       bal: "Weak overall. Wind stress curl (−), bottom pressure torque (+). Largely geostrophic." },
+  { ab: "S-SV", name: "Southward-Sverdrupian", bal: "Wind stress curl (+), planetary vorticity advection (−)." },
+  { ab: "N-SV", name: "Northward-Sverdrupian", bal: "Wind stress curl (−), advection (+). The classic Sverdrup balance." },
+  { ab: "TR",   name: "Transitional",          bal: "Wind (+), advection (−), bottom pressure torque (−). Deep water formation regions." },
+  { ab: "SO",   name: "Southern Ocean",        bal: "Wind, advection, and bottom pressure torque all large." },
+  { ab: "NL",   name: "Nonlinear",             bal: "No single dominant term. Large nonlinear torque." },
+];
+const MODEL_ORDER = ["GFDL-CM4", "GFDL-ESM4", "IPSL-CM6A-LR", "UKESM1-0-LL", "CESM2", "E3SM-1-0", "CanESM5"];
+const MODELS = {
+  "GFDL-CM4":     { short: "MOM6 · 0.25°", grid: "MOM6 OM4p25, tripolar",    dims: "1080 × 1440", sp: "0.20° × 0.25°", ke: "32,721" },
+  "GFDL-ESM4":    { short: "MOM6 · 0.5°",  grid: "MOM6 OM4p5, tripolar",     dims: "576 × 720",   sp: "0.41° × 0.50°", ke: "8,282" },
+  "IPSL-CM6A-LR": { short: "NEMO · ~1°",   grid: "NEMO eORCA1",              dims: "332 × 362",   sp: "0.77° × 1.00°", ke: "1,933" },
+  "UKESM1-0-LL":  { short: "NEMO · ~1°",   grid: "NEMO eORCA1",              dims: "330 × 360",   sp: "0.77° × 1.00°", ke: "1,933" },
+  "CESM2":        { short: "POP2 · ~1°",   grid: "POP2 gx1v7, displaced pole", dims: "384 × 320", sp: "0.53° × 1.12°", ke: "2,691" },
+  "E3SM-1-0":     { short: "MPAS · 1°",    grid: "MPAS-Ocean, published at 1°", dims: "180 × 360", sp: "1.00° × 1.00°", ke: "1,722" },
+  "CanESM5":      { short: "NEMO · ~1°",   grid: "NEMO ORCA1",               dims: "291 × 360",   sp: "0.77° × 1.00°", ke: "1,933" },
+};
+const SCEN = ["historical", "1pctCO2", "abrupt-4xCO2"];
+const BASINS = { ke: "Kuroshio Extension", na: "North Atlantic" };
+const TYPES = [
+  { id: "regimes", label: "Regime maps", min: 240, sub: false,
+    desc: "Majority-vote regime class from the 50-member ensemble over the Kuroshio Extension box (127–177°E, 15–53°N), one map per model and experiment." },
+  { id: "shap", label: "SHAP · KE basin", min: 330, sub: true,
+    desc: "Feature attributions for each regime class over the Kuroshio Extension box. Red pushes a grid point toward that regime and blue pushes it away. Values appear only where the middle half of the 50 ensemble members agree on sign." },
+  { id: "shap_window", label: "SHAP · separation window", min: 330, sub: true,
+    desc: "The same attributions over the Kuroshio separation window (130–165°E, 25–45°N), for the historical runs of the two GFDL models." },
+  { id: "ecco", label: "ECCO vs model", min: 440, sub: false,
+    desc: "THOR run on the ECCO state estimate (left) beside THOR run on the model (right). The ECCO panel is the same in every plot; only the model side changes with experiment." },
+  { id: "grid_regimes", label: "Model grids · regimes", min: 480, sub: false,
+    desc: "Rows are models and columns are experiments. Black contours trace the 75th to 95th percentiles of current speed, or of SSH gradient where a model has no current output. Arrows show flow direction where current output exists." },
+  { id: "grid_ssh", label: "Model grids · SSH variability", min: 480, sub: false,
+    desc: "Temporal standard deviation of sea surface height over each run's full record, before any THOR classification. Contours trace the steepest SSH gradients." },
+  { id: "key", label: "Regime key image", min: 300, sub: false,
+    desc: "The regime key as an image, as used in the slides." },
+];
+const TYPE = Object.fromEntries(TYPES.map(t => [t.id, t]));
+const GROUPS = {
+  gfdl:             { label: "GFDL pair",        models: ["GFDL-CM4", "GFDL-ESM4"] },
+  lowres:           { label: "Low-res trio",     models: ["IPSL-CM6A-LR", "UKESM1-0-LL", "CESM2"] },
+  orig:             { label: "Original trio",    models: ["CESM2", "E3SM-1-0", "CanESM5"] },
+  "ecco-GFDL-ESM4": { label: "ECCO × GFDL-ESM4", models: ["GFDL-ESM4"], ecco: true },
+  "ecco-CESM2":     { label: "ECCO × CESM2",     models: ["CESM2"], ecco: true },
+};
+
+const state = { type: null, model: null, scenario: null, basin: null, regime: null, group: null };
+let visible = [];
+let lbIndex = 0;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const regimeTag = r => `<span class="rg"><i style="background:var(--r${r})"></i>${REGIMES[r].ab}</span>`;
+
+function matches(it, s = state) {
+  if (s.type && it.type !== s.type) return false;
+  if (s.model && !it.models.includes(s.model)) return false;
+  if (s.scenario && it.scenario !== "all" && it.scenario !== s.scenario) return false;
+  if (s.basin && it.basin !== s.basin) return false;
+  if (s.regime !== null && it.regime !== s.regime) return false;
+  if (s.group && it.group !== s.group) return false;
+  return true;
+}
+const countWith = patch => ITEMS.filter(it => matches(it, { type: null, model: null, scenario: null, basin: null, regime: null, group: null, ...patch })).length;
+
+function fullLabel(it) {
+  const m = it.models.join(", ");
+  const r = it.regime !== null ? `${REGIMES[it.regime].ab} (class ${it.regime})` : "";
+  switch (it.type) {
+    case "regimes": return `THOR regimes · ${m} · ${it.scenario} · Kuroshio Extension`;
+    case "shap": return `SHAP · ${m} · ${it.scenario} · ${r} · Kuroshio Extension box`;
+    case "shap_window": return `SHAP · ${m} · ${it.scenario} · ${r} · separation window`;
+    case "ecco": return `ECCO vs ${m} · ${it.scenario} · ${BASINS[it.basin]}`;
+    case "grid_regimes": return `Regime classification · ${m} · ${BASINS[it.basin]} · all three experiments`;
+    case "grid_ssh": return `SSH variability · ${m} · ${BASINS[it.basin]} · all three experiments`;
+    default: return "Regime key";
+  }
+}
+
+function cardHTML(it) {
+  let title = "", tags = [];
+  switch (it.type) {
+    case "regimes": title = `${it.models[0]} · ${it.scenario}`; tags = [`<span class="tag">KE</span>`]; break;
+    case "shap":
+    case "shap_window": title = `${REGIMES[it.regime].name} · class ${it.regime}`; tags = [regimeTag(it.regime)]; break;
+    case "ecco": title = `ECCO vs ${it.models[0]}`; tags = [`<span class="tag">${it.scenario}</span>`, `<span class="tag">${it.basin.toUpperCase()}</span>`]; break;
+    case "grid_regimes":
+    case "grid_ssh": title = it.models.join(", "); tags = [`<span class="tag">${BASINS[it.basin]}</span>`, `<span class="tag">3 experiments</span>`]; break;
+    default: title = "Regime key";
+  }
+  return `<div class="cap-title">${esc(title)}</div>${tags.length ? `<div class="cap-meta">${tags.join("")}</div>` : ""}<div class="fname">${esc(it.file)}</div>`;
+}
+
+function plates(arr, min) {
+  const wrap = document.createElement("div");
+  wrap.className = "plates";
+  wrap.style.gridTemplateColumns = `repeat(auto-fill, minmax(min(100%, ${min}px), 1fr))`;
+  for (const it of arr) {
+    const idx = visible.push(it) - 1;
+    const fig = document.createElement("figure");
+    fig.className = "plate";
+    fig.innerHTML = `<button type="button" class="frame" data-idx="${idx}" aria-label="Enlarge: ${esc(fullLabel(it))}"><img src="${esc(it.src)}" width="${it.w}" height="${it.h}" loading="lazy" decoding="async" alt="${esc(fullLabel(it))}"></button><figcaption>${cardHTML(it)}</figcaption>`;
+    wrap.appendChild(fig);
+  }
+  return wrap;
+}
+
+function renderGallery() {
+  const g = $("gallery");
+  g.innerHTML = "";
+  visible = [];
+  for (const t of TYPES) {
+    const its = ITEMS.filter(i => i.type === t.id && matches(i));
+    if (!its.length) continue;
+    const sec = document.createElement("section");
+    sec.className = "sec";
+    sec.id = "sec-" + t.id;
+    sec.innerHTML = `<div class="sec-head"><h2>${esc(t.label)}</h2><span class="count">${its.length} ${its.length === 1 ? "plot" : "plots"}</span></div><p class="sec-desc">${esc(t.desc)}</p>`;
+    if (t.sub) {
+      const groups = new Map();
+      for (const i of its) {
+        const k = `${i.models[0]}|${i.scenario}`;
+        if (!groups.has(k)) groups.set(k, []);
+        groups.get(k).push(i);
+      }
+      for (const [k, arr] of groups) {
+        const [m, s] = k.split("|");
+        const sub = document.createElement("div");
+        sub.className = "subgroup";
+        sub.innerHTML = `<h3 class="sub-head">${esc(m)}<span>/</span>${esc(s)}</h3>`;
+        sub.appendChild(plates(arr, t.min));
+        sec.appendChild(sub);
+      }
+    } else {
+      sec.appendChild(plates(its, t.min));
+    }
+    g.appendChild(sec);
+  }
+  if (!visible.length) {
+    g.innerHTML = `<div class="empty"><p>No plots match these filters.</p><button type="button" class="btn" data-clear>Clear filters</button></div>`;
+  }
+}
+
+const FILTER_ROWS = [
+  { key: "type", label: "Plot type", opts: () => TYPES.map(t => ({ v: t.id, l: t.label, n: countWith({ type: t.id }) })) },
+  { key: "model", label: "Model", opts: () => MODEL_ORDER.map(m => ({ v: m, l: m, n: countWith({ model: m }) })) },
+  { key: "scenario", label: "Experiment", opts: () => SCEN.map(s => ({ v: s, l: s, n: countWith({ scenario: s }) })) },
+  { key: "basin", label: "Basin", opts: () => Object.entries(BASINS).map(([v, l]) => ({ v, l, n: countWith({ basin: v }) })) },
+  { key: "regime", label: "Regime", opts: () => REGIMES.map((r, i) => ({ v: i, l: r.ab, n: countWith({ regime: i }), sw: i })) },
+];
+
+function buildFilters() {
+  const f = $("filters");
+  for (const row of FILTER_ROWS) {
+    const div = document.createElement("div");
+    div.className = "frow";
+    div.setAttribute("role", "group");
+    div.setAttribute("aria-label", row.label);
+    div.innerHTML = `<span class="flabel">${row.label}</span>` +
+      `<button type="button" class="chip" data-key="${row.key}" data-v="">All</button>` +
+      row.opts().map(o => `<button type="button" class="chip" data-key="${row.key}" data-v="${esc(o.v)}">${o.sw !== undefined ? `<i style="background:var(--r${o.sw})"></i>` : ""}${esc(o.l)}<span class="c">${o.n}</span></button>`).join("");
+    f.appendChild(div);
+  }
+  f.addEventListener("click", e => {
+    const b = e.target.closest(".chip");
+    if (!b) return;
+    const key = b.dataset.key;
+    let v = b.dataset.v === "" ? null : b.dataset.v;
+    if (key === "regime" && v !== null) v = Number(v);
+    state[key] = state[key] === v ? null : v;
+    if (key === "model" && v !== null) state.group = null;
+    update();
+  });
+}
+
+function syncFilters() {
+  for (const b of document.querySelectorAll("#filters .chip")) {
+    const key = b.dataset.key;
+    const cur = state[key];
+    const v = b.dataset.v === "" ? null : (key === "regime" ? Number(b.dataset.v) : b.dataset.v);
+    b.setAttribute("aria-pressed", String(cur === v));
+  }
+}
+
+const FILTER_NAMES = { type: "Type", model: "Model", scenario: "Experiment", basin: "Basin", regime: "Regime", group: "Comparison" };
+function valueLabel(key, v) {
+  if (key === "type") return TYPE[v].label;
+  if (key === "basin") return BASINS[v];
+  if (key === "regime") return REGIMES[v].ab;
+  if (key === "group") return GROUPS[v].label;
+  return v;
+}
+
+function renderStatus() {
+  $("count").textContent = `Showing ${visible.length} of ${ITEMS.length} plots`;
+  const act = $("active");
+  act.innerHTML = "";
+  let any = false;
+  for (const key of Object.keys(state)) {
+    if (state[key] === null) continue;
+    any = true;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "pill";
+    b.dataset.key = key;
+    b.setAttribute("aria-label", `Remove filter ${FILTER_NAMES[key]}: ${valueLabel(key, state[key])}`);
+    b.innerHTML = `<b>${FILTER_NAMES[key]}</b>${esc(valueLabel(key, state[key]))}<span class="x" aria-hidden="true">×</span>`;
+    act.appendChild(b);
+  }
+  $("clear-all").hidden = !any;
+}
+
+/* Map */
+const NS = "http://www.w3.org/2000/svg";
+const MX = { "GFDL-CM4": 75, "GFDL-ESM4": 215, "IPSL-CM6A-LR": 355, "UKESM1-0-LL": 495, "CESM2": 635, "E3SM-1-0": 775, "CanESM5": 915 };
+const MAP_NODES = [
+  { id: "ECCO", kind: "ref", x: 505, y: 62, w: 210, h: 66, l1: "ECCO v4r3", l2: "MITgcm LLC90 → 0.5°", l3: "reference state estimate, 1992–2013" },
+  ...MODEL_ORDER.map(m => ({ id: m, kind: "model", x: MX[m], y: 284, w: 126, h: 68, l1: m, l2: MODELS[m].short })),
+  { id: "gfdl", kind: "comp", x: 145, y: 400, w: 142, h: 44 },
+  { id: "lowres", kind: "comp", x: 495, y: 400, w: 142, h: 44 },
+  { id: "orig", kind: "comp", x: 775, y: 400, w: 142, h: 44 },
+  { id: "ecco-GFDL-ESM4", kind: "comp", x: 350, y: 172, w: 152, h: 44 },
+  { id: "ecco-CESM2", kind: "comp", x: 590, y: 172, w: 152, h: 44 },
+];
+const NODE = Object.fromEntries(MAP_NODES.map(n => [n.id, n]));
+const MAP_EDGES = [];
+for (const [gid, g] of Object.entries(GROUPS)) {
+  for (const m of g.models) MAP_EDGES.push([gid, m]);
+  if (g.ecco) MAP_EDGES.push(["ECCO", gid]);
+}
+
+function svgEl(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+function buildMap() {
+  const svg = $("map");
+  const edgeLayer = svgEl("g", {}, svg);
+  for (const [a, b] of MAP_EDGES) {
+    const na = NODE[a], nb = NODE[b];
+    const line = svgEl("line", { x1: na.x, y1: na.y, x2: nb.x, y2: nb.y, class: "edge" }, edgeLayer);
+    line.dataset.a = a;
+    line.dataset.b = b;
+  }
+  for (const n of MAP_NODES) {
+    const g = svgEl("g", { class: `node ${n.kind}`, tabindex: "0", role: "button" }, svg);
+    g.dataset.id = n.id;
+    svgEl("rect", { x: n.x - n.w / 2, y: n.y - n.h / 2, width: n.w, height: n.h, rx: n.kind === "comp" ? n.h / 2 : 6 }, g);
+    let lines;
+    if (n.kind === "model") {
+      const c = countWith({ model: n.id });
+      lines = [["t1", n.l1, -13], ["t2", n.l2, 5], ["t3", `${c} plots`, 22]];
+      g.setAttribute("aria-label", `${n.id}, ${MODELS[n.id].grid}, ${c} plots`);
+    } else if (n.kind === "comp") {
+      const c = countWith({ group: n.id });
+      lines = [["t1", GROUPS[n.id].label, -5], ["t3", `${c} plots`, 12]];
+      g.setAttribute("aria-label", `${GROUPS[n.id].label} comparison, ${c} plots`);
+    } else {
+      const c = countWith({ type: "ecco" });
+      lines = [["t1", n.l1, -13], ["t2", n.l2, 5], ["t3", n.l3, 22]];
+      g.setAttribute("aria-label", `ECCO reference, all ${c} ECCO comparison plots`);
+    }
+    for (const [cls, text, dy] of lines) {
+      const t = svgEl("text", { x: n.x, y: n.y + dy, class: cls, "text-anchor": "middle", "dominant-baseline": "middle" }, g);
+      t.textContent = text;
+    }
+  }
+  svg.addEventListener("click", e => {
+    const g = e.target.closest(".node");
+    if (g) selectNode(g.dataset.id);
+  });
+  svg.addEventListener("keydown", e => {
+    const g = e.target.closest(".node");
+    if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectNode(g.dataset.id); }
+  });
+}
+
+function selectNode(id) {
+  const n = NODE[id];
+  if (n.kind === "model") {
+    state.model = state.model === id ? null : id;
+    state.group = null;
+  } else if (n.kind === "comp") {
+    state.group = state.group === id ? null : id;
+    state.model = null;
+  } else {
+    const on = state.type === "ecco" && !state.group;
+    state.type = on ? null : "ecco";
+    state.group = null;
+  }
+  update();
+}
+
+function syncMap() {
+  const active = new Set(), related = new Set();
+  if (state.group) {
+    active.add(state.group);
+    GROUPS[state.group].models.forEach(m => related.add(m));
+    if (GROUPS[state.group].ecco) related.add("ECCO");
+  } else if (state.model) {
+    active.add(state.model);
+    for (const [gid, g] of Object.entries(GROUPS)) if (g.models.includes(state.model)) related.add(gid);
+  } else if (state.type === "ecco") {
+    active.add("ECCO");
+    for (const [gid, g] of Object.entries(GROUPS)) if (g.ecco) related.add(gid);
+  }
+  const anySel = active.size > 0;
+  for (const g of document.querySelectorAll("#map .node")) {
+    const id = g.dataset.id;
+    g.classList.toggle("active", active.has(id));
+    g.classList.toggle("related", related.has(id));
+    g.classList.toggle("dim", anySel && !active.has(id) && !related.has(id));
+    g.setAttribute("aria-pressed", String(active.has(id)));
+  }
+  for (const l of document.querySelectorAll("#map .edge")) {
+    const { a, b } = l.dataset;
+    const hot = (active.has(a) || active.has(b)) && (active.has(a) || related.has(a)) && (active.has(b) || related.has(b));
+    l.classList.toggle("hot", hot);
+  }
+  const sel = $("map-sel");
+  let label = null;
+  if (state.group) label = GROUPS[state.group].label;
+  else if (state.model) label = state.model;
+  else if (state.type === "ecco") label = "ECCO comparisons";
+  sel.innerHTML = label
+    ? `<strong>${esc(label)}</strong>: ${visible.length} ${visible.length === 1 ? "plot" : "plots"} with the current filters. <a href="#plots">Jump to plots</a>`
+    : `Nothing selected. Showing all ${ITEMS.length} plots below.`;
+}
+
+function update() {
+  renderGallery();
+  syncFilters();
+  renderStatus();
+  syncMap();
+}
+
+/* Lightbox */
+const lb = $("lb");
+function showLB(i) {
+  lbIndex = (i + visible.length) % visible.length;
+  const it = visible[lbIndex];
+  const img = $("lb-img");
+  img.src = it.src;
+  img.alt = fullLabel(it);
+  $("lb-title").textContent = fullLabel(it);
+  $("lb-sub").textContent = it.src;
+  $("lb-count").textContent = `${lbIndex + 1} / ${visible.length}`;
+}
+function openLB(i) {
+  showLB(i);
+  if (!lb.open) lb.showModal();
+}
+$("gallery").addEventListener("click", e => {
+  const f = e.target.closest(".frame");
+  if (f) { openLB(Number(f.dataset.idx)); return; }
+  if (e.target.closest("[data-clear]")) clearAll();
+});
+$("lb-prev").addEventListener("click", () => showLB(lbIndex - 1));
+$("lb-next").addEventListener("click", () => showLB(lbIndex + 1));
+$("lb-close").addEventListener("click", () => lb.close());
+lb.addEventListener("click", e => { if (e.target === lb) lb.close(); });
+lb.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft") { e.preventDefault(); showLB(lbIndex - 1); }
+  if (e.key === "ArrowRight") { e.preventDefault(); showLB(lbIndex + 1); }
+});
+
+function clearAll() {
+  for (const k of Object.keys(state)) state[k] = null;
+  update();
+}
+$("active").addEventListener("click", e => {
+  const p = e.target.closest(".pill");
+  if (!p) return;
+  state[p.dataset.key] = null;
+  update();
+});
+$("clear-all").addEventListener("click", clearAll);
+
+/* Static parts */
+$("key").innerHTML = REGIMES.map((r, i) =>
+  `<li><span class="sw" style="background:var(--r${i})"></span><span class="name"><span class="n">${i}</span><span class="ab">${r.ab}</span>${r.name}</span><span class="bal">${r.bal}</span></li>`
+).join("");
+$("grid-rows").innerHTML = MODEL_ORDER.map(m => {
+  const d = MODELS[m];
+  return `<tr><td>${m}</td><td>${d.grid}</td><td class="num">${d.dims}</td><td class="num">${d.sp}</td><td class="num">${d.ke}</td></tr>`;
+}).join("") + `<tr><td>ECCO v4r3</td><td>MITgcm LLC90, interpolated to regular 0.5°</td><td class="num">360 × 720</td><td class="num">0.50° × 0.50°</td><td class="num">—</td></tr>`;
+{
+  const nModels = new Set(ITEMS.flatMap(i => i.models)).size;
+  $("meta").textContent = `${ITEMS.length} plots · ${nModels} models · 3 experiments · 2 basins · compiled 1 Oct 2026`;
+}
+
+buildFilters();
+buildMap();
+update();
+</script>
+
+</body>
+</html>
