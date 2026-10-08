@@ -228,6 +228,7 @@ td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; whit
         <li>ECCO's mask blanks some ocean: the Sea of Japan, most of the Sea of Okhotsk, and the East China Sea shelf. Small islands such as the Azores, Madeira, and the Faroes show up as coarse blocks. The mask comes from ECCO's own preprocessing (a budget-residual filter combined with the open-water fraction), which isn't included in the DNN4Cli code.</li>
         <li>Model coastlines look wider than ECCO's. THOR's inputs use spatial gradients, which are undefined next to land, so each model loses about 9% more cells than its bathymetry mask alone removes.</li>
         <li>Class numbers were matched to regime names from the Step 1 clustering data, using term magnitudes, term signs, and geography against Sonnewald &amp; Lguensat (2021). The original code doesn't store this mapping.</li>
+        <li>Regime maps, ECCO comparisons, and model grids use 20-year input means: 1995–2014 for historical and experiment years 131–150 for the CO2 runs. An earlier version averaged whatever span each model's downloaded file happened to cover, anywhere from 5 to 300 years. The SHAP and LRP plots haven't been rerun on the new windows yet, so they still reflect those earlier averaging periods.</li>
         <li>SHAP uses fastshap's KernelExplainer with a 100-point background sample, run separately on each of the 50 ensemble members, at every ocean point of each model's native grid.</li>
         <li>LRP uses the ε-rule (ε = 0.25 × the standard deviation of each layer's pre-activations). It's computed over the whole domain and cropped to each basin, so the values match a whole-domain run.</li>
         <li>The SSH anomaly plots follow GCOOS's method with a 2005–2014 reference period, which spans both an unstable (2006–2008) and a stable (2009–2014) Kuroshio Extension state. Observations are Copernicus DUACS DT2021 from NOAA AOML's ERDDAP mirror (1993–2022). Both panels share the observed reference mean by construction, and a free-running model's eddies and jet state aren't in phase with the real ocean, so the useful comparison is amplitude and spatial scale, not where individual features sit. The model panel shows whatever state the model happened to be in that month, not the observed state.</li>
@@ -279,7 +280,7 @@ const SCEN = ["historical", "1pctCO2", "abrupt-4xCO2"];
 const BASINS = { ke: "Kuroshio Extension", na: "North Atlantic" };
 const TYPES = [
   { id: "regimes", label: "Regime maps", min: 240, sub: false,
-    desc: "Majority-vote regime class from the 50-member ensemble, one map per model, experiment, and basin: the Kuroshio Extension box (127–177°E, 15–53°N) and the North Atlantic box (80°W–20°E, 20–66°N)." },
+    desc: "Majority-vote regime class from the 50-member ensemble, one map per model, experiment, and basin: the Kuroshio Extension box (127–177°E, 15–53°N) and the North Atlantic box (80°W–20°E, 20–66°N). THOR's inputs are 20-year means: 1995–2014 for historical, experiment years 131–150 for 1pctCO2 and abrupt-4xCO2." },
   { id: "shap", label: "SHAP · full basin", min: 330, sub: true,
     desc: "Feature attributions for each regime class over the whole Kuroshio Extension or North Atlantic box. Red pushes a grid point toward that regime and blue pushes it away. Values appear only where the middle half of the 50 ensemble members agree on sign." },
   { id: "shap_window", label: "SHAP · separation window", min: 330, sub: true,
@@ -293,9 +294,9 @@ const TYPES = [
   { id: "ecco", label: "ECCO vs model", min: 440, sub: false,
     desc: "THOR run on the ECCO state estimate (left) beside THOR run on the model (right). The ECCO panel is the same in every plot; only the model side changes with experiment." },
   { id: "grid_regimes", label: "Model grids · regimes", min: 480, sub: false,
-    desc: "Rows are models and columns are experiments. Black contours trace the 75th to 95th percentiles of current speed, or of SSH gradient where a model has no current output. Arrows show flow direction where current output exists." },
+    desc: "Rows are models and columns are experiments, all on the same 20-year windows as the regime maps. Black contours trace the 75th to 95th percentiles of SSH gradient from the window's mean SSH." },
   { id: "grid_ssh", label: "Model grids · SSH variability", min: 480, sub: false,
-    desc: "Temporal standard deviation of sea surface height over each run's full record, before any THOR classification. Contours trace the steepest SSH gradients." },
+    desc: "Monthly standard deviation of sea surface height over each run's 20-year window, before any THOR classification. Contours trace the steepest SSH gradients." },
   { id: "key", label: "Regime key image", min: 300, sub: false,
     desc: "The regime key as an image, as used in the slides." },
 ];
@@ -661,7 +662,7 @@ $("grid-rows").innerHTML = MODEL_ORDER.map(m => {
 }).join("") + `<tr><td>ECCO v4r3</td><td>MITgcm LLC90, interpolated to regular 0.5°</td><td class="num">360 × 720</td><td class="num">0.50° × 0.50°</td><td class="num">—</td><td class="num">—</td></tr>`;
 {
   const nModels = new Set(ITEMS.flatMap(i => i.models)).size;
-  $("meta").textContent = `${ITEMS.length} plots · ${nModels} models · 3 experiments · 2 basins · compiled 6 Oct 2026`;
+  $("meta").textContent = `${ITEMS.length} plots · ${nModels} models · 3 experiments · 2 basins · compiled 8 Oct 2026`;
 }
 
 buildFilters();
