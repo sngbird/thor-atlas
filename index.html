@@ -296,7 +296,7 @@ const TYPES = [
   { id: "ssha", label: "SSH anomaly vs altimetry", min: 440, sub: false,
     desc: "Observed sea level anomaly (Copernicus DUACS, left) beside the model's SSH anomaly (right), using GCOOS's method: the model's SSH minus its 2005–2014 mean, plus the observed 2005–2014 mean SLA. Kuroshio Extension plots show one month in each dynamic state, July 2008 (unstable) and July 2013 (stable); North Atlantic plots show July 2013. The observed mean appears in both panels by construction, so compare amplitude and spatial scale rather than where individual eddies sit." },
   { id: "obs", label: "Observational THOR", min: 440, sub: false,
-    desc: "THOR run on observations instead of a model: DUACS absolute dynamic topography, scatterometer wind stress (QuikSCAT Jan 2000–Oct 2009, then Metop-A ASCAT), and ETOPO1 bathymetry, all averaged over 2000–2014. Every field is block-averaged to 1° and interpolated to ECCO's 0.5° grid, as THOR's training data was, so the observed map and ECCO's compare cell by cell. The scatterometer record stops at 75°, and cells under seasonal sea ice are dropped. The per-model plots show ECCO, the observations, and the model's historical run side by side; their titles give the share of cells where ECCO and the model each match the observed regime, sampling the model at the nearest of its cells within 0.75°." },
+    desc: "THOR run on observations instead of a model: DUACS absolute dynamic topography, scatterometer wind stress (QuikSCAT Jan 2000–Oct 2009, then Metop-A ASCAT), and ETOPO1 bathymetry, all averaged over 2000–2014. Every field is block-averaged to 1° and interpolated to ECCO's 0.5° grid, as THOR's training data was, so the observed map and ECCO's compare cell by cell. The scatterometer record stops at 75°, and cells under seasonal sea ice are dropped; that ocean is shaded gray. The per-model plots show ECCO, the observations, and the model's historical run side by side; their titles give the share of cells where ECCO and the model each match the observed regime, sampling the model at the nearest of its cells within 0.75°." },
   { id: "ecco", label: "ECCO vs model", min: 440, sub: false,
     desc: "THOR run on the ECCO state estimate (left) beside THOR run on the model (right). The ECCO panel is the same in every plot; only the model side changes with experiment." },
   { id: "stress_smooth", label: "Wind stress smoothing", min: 440, sub: false,
@@ -674,7 +674,7 @@ $("grid-rows").innerHTML = MODEL_ORDER.map(m => {
 }).join("") + `<tr><td>ECCO v4r3</td><td>MITgcm LLC90, interpolated to regular 0.5°</td><td class="num">360 × 720</td><td class="num">0.50° × 0.50°</td><td class="num">—</td><td class="num">—</td></tr>`;
 {
   const nModels = new Set(ITEMS.flatMap(i => i.models)).size;
-  $("meta").textContent = `${ITEMS.length} plots · ${nModels} models · 3 experiments · 2 basins · compiled 9 Oct 2026`;
+  $("meta").textContent = `${ITEMS.length} plots · ${nModels} models · 3 experiments · 2 basins · compiled 12 Oct 2026`;
 }
 
 buildFilters();
