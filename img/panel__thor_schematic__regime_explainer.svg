@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="460.8pt" height="280.8pt" viewBox="0 0 460.8 280.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-24T01:45:45.154973</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 280.8 
+L 460.8 280.8 
+L 460.8 0 
+L 0 0 
+L 0 280.8 
+z
+" style="fill: none"/>
+  </g>
+  <g id="patch_2">
+   <path d="M 12.9024 73.5696 
+L 26.2656 73.5696 
+Q 29.952 73.5696 29.952 71.3232 
+L 29.952 54.756 
+Q 29.952 52.5096 26.2656 52.5096 
+L 12.9024 52.5096 
+Q 9.216 52.5096 9.216 54.756 
+L 9.216 71.3232 
+Q 9.216 73.5696 12.9024 73.5696 
+z
+" style="fill: #0072b2"/>
+  </g>
+  <g id="patch_3">
+   <path d="M 12.9024 108.6696 
+L 26.2656 108.6696 
+Q 29.952 108.6696 29.952 106.4232 
+L 29.952 89.856 
+Q 29.952 87.6096 26.2656 87.6096 
+L 12.9024 87.6096 
+Q 9.216 87.6096 9.216 89.856 
+L 9.216 106.4232 
+Q 9.216 108.6696 12.9024 108.6696 
+z
+" style="fill: #e69f00"/>
+  </g>
+  <g id="patch_4">
+   <path d="M 12.9024 143.7696 
+L 26.2656 143.7696 
+Q 29.952 143.7696 29.952 141.5232 
+L 29.952 124.956 
+Q 29.952 122.7096 26.2656 122.7096 
+L 12.9024 122.7096 
+Q 9.216 122.7096 9.216 124.956 
+L 9.216 141.5232 
+Q 9.216 143.7696 12.9024 143.7696 
+z
+" style="fill: #009e73"/>
+  </g>
+  <g id="patch_5">
+   <path d="M 12.9024 178.8696 
+L 26.2656 178.8696 
+Q 29.952 178.8696 29.952 176.6232 
+L 29.952 160.056 
+Q 29.952 157.8096 26.2656 157.8096 
+L 12.9024 157.8096 
+Q 9.216 157.8096 9.216 160.056 
+L 9.216 176.6232 
+Q 9.216 178.8696 12.9024 178.8696 
+z
+" style="fill: #d55e00"/>
+  </g>
+  <g id="patch_6">
+   <path d="M 12.9024 213.9696 
+L 26.2656 213.9696 
+Q 29.952 213.9696 29.952 211.7232 
+L 29.952 195.156 
+Q 29.952 192.9096 26.2656 192.9096 
+L 12.9024 192.9096 
+Q 9.216 192.9096 9.216 195.156 
+L 9.216 211.7232 
+Q 9.216 213.9696 12.9024 213.9696 
+z
+" style="fill: #56b4e9"/>
+  </g>
+  <g id="patch_7">
+   <path d="M 12.9024 249.0696 
+L 26.2656 249.0696 
+Q 29.952 249.0696 29.952 246.8232 
+L 29.952 230.256 
+Q 29.952 228.0096 26.2656 228.0096 
+L 12.9024 228.0096 
+Q 9.216 228.0096 9.216 230.256 
+L 9.216 246.8232 
+Q 9.216 249.0696 12.9024 249.0696 
+z
+" style="fill: #cc79a7"/>
+  </g>
+  <g id="text_1">
+   <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #1f1f1e" x="9.216" y="18.301969" transform="rotate(-0 9.216 18.301969)">What the six regimes mean</text>
+  </g>
+  <g id="text_2">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #5f5e5a" x="9.216" y="36.322594" transform="rotate(-0 9.216 36.322594)">which terms balance in the depth-integrated vorticity budget</text>
+  </g>
+  <g id="text_3">
+   <text style="font-weight: 700; font-size: 11.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #1f1f1e" x="36.864" y="64.763305" transform="rotate(-0 36.864 64.763305)">MD</text>
+  </g>
+  <g id="text_4">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #1f1f1e" x="87.552" y="59.189745" transform="rotate(-0 87.552 59.189745)">all vorticity inputs weak; no single balance</text>
+  </g>
+  <g id="text_5">
+   <text style="font-style: italic; font-size: 8.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #5f5e5a" x="87.552" y="71.28514" transform="rotate(-0 87.552 71.28514)">the band between the gyres; tropics</text>
+  </g>
+  <g id="text_6">
+   <text style="font-weight: 700; font-size: 11.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #1f1f1e" x="36.864" y="99.863305" transform="rotate(-0 36.864 99.863305)">S-SV</text>
+  </g>
+  <g id="text_7">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #1f1f1e" x="87.552" y="94.289745" transform="rotate(-0 87.552 94.289745)">Sverdrup: positive wind curl, northward interior flow</text>
+  </g>
+  <g id="text_8">
+   <text style="font-style: italic; font-size: 8.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #5f5e5a" x="87.552" y="106.38514" transform="rotate(-0 87.552 106.38514)">subpolar gyre (here); southern subtropical gyres</text>
+  </g>
+  <g id="text_9">
+   <text style="font-weight: 700; font-size: 11.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #1f1f1e" x="36.864" y="134.963305" transform="rotate(-0 36.864 134.963305)">N-SV</text>
+  </g>
+  <g id="text_10">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #1f1f1e" x="87.552" y="129.389745" transform="rotate(-0 87.552 129.389745)">Sverdrup: negative wind curl, southward interior flow</text>
+  </g>
+  <g id="text_11">
+   <text style="font-style: italic; font-size: 8.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #5f5e5a" x="87.552" y="141.48514" transform="rotate(-0 87.552 141.48514)">subtropical gyres</text>
+  </g>
+  <g id="text_12">
+   <text style="font-weight: 700; font-size: 11.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #1f1f1e" x="36.864" y="170.063305" transform="rotate(-0 36.864 170.063305)">TR</text>
+  </g>
+  <g id="text_13">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #1f1f1e" x="87.552" y="164.489745" transform="rotate(-0 87.552 164.489745)">wind, flow and seafloor torque all matter</text>
+  </g>
+  <g id="text_14">
+   <text style="font-style: italic; font-size: 8.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #5f5e5a" x="87.552" y="176.58514" transform="rotate(-0 87.552 176.58514)">subpolar North Atlantic, Labrador–Irminger</text>
+  </g>
+  <g id="text_15">
+   <text style="font-weight: 700; font-size: 11.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #1f1f1e" x="36.864" y="205.163305" transform="rotate(-0 36.864 205.163305)">SO</text>
+  </g>
+  <g id="text_16">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #1f1f1e" x="87.552" y="199.589745" transform="rotate(-0 87.552 199.589745)">all terms large, Southern-Ocean-like</text>
+  </g>
+  <g id="text_17">
+   <text style="font-style: italic; font-size: 8.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #5f5e5a" x="87.552" y="211.68514" transform="rotate(-0 87.552 211.68514)">rare in these boxes</text>
+  </g>
+  <g id="text_18">
+   <text style="font-weight: 700; font-size: 11.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #1f1f1e" x="36.864" y="240.263305" transform="rotate(-0 36.864 240.263305)">NL</text>
+  </g>
+  <g id="text_19">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #1f1f1e" x="87.552" y="234.689745" transform="rotate(-0 87.552 234.689745)">nonlinear torque from jets and eddies dominates</text>
+  </g>
+  <g id="text_20">
+   <text style="font-style: italic; font-size: 8.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #5f5e5a" x="87.552" y="246.78514" transform="rotate(-0 87.552 246.78514)">boundary currents and their extensions</text>
+  </g>
+ </g>
+</svg>
